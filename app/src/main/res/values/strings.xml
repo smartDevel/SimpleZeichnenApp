@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Einfach eine Zeichen-App</string>
+    <string name="toolTipIbGallery">Hintergrund-Bild laden</string>
 </resources>

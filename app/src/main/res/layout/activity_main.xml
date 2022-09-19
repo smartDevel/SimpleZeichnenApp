@@ -52,7 +52,8 @@
             android:contentDescription="image"
             android:onClick="paintClicked"
             android:src="@drawable/pallet_normal"
-            android:tag="@color/skin" />
+            android:tag="@color/skin"
+            />
 
         <ImageButton
             android:layout_width="25dp"
@@ -142,7 +143,9 @@
             android:layout_margin="5dp"
             android:contentDescription="image"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_gallery" />
+            android:src="@drawable/ic_gallery"
+            android:tooltipText="@string/toolTipIbGallery"
+            />
 
         <ImageButton
             android:id="@+id/ib_undo"
