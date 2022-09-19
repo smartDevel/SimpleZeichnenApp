@@ -164,6 +164,14 @@
             android:contentDescription="image"
             android:scaleType="fitXY"
             android:src="@drawable/ic_brush" />
+        <ImageButton
+            android:id="@+id/ib_stroke"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_margin="5dp"
+            android:contentDescription="image"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_strokestyle" />
 
         <ImageButton
             android:id="@+id/ib_save"

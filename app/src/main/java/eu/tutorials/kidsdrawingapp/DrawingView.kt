@@ -7,9 +7,36 @@ import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 
-class DrawingView(context: Context,attrs:AttributeSet): View(context,attrs) {
+/*
+If you want to draw something, then you need to do that on something
+that is of type view.
+So that's why we need to go ahead and create a class which will inherit of this class called View.
+ */
+class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) {
+/*
+And if you want to draw, then you first of all need to know what type of color you want to have, what
+kind of paint you want to have. So paint is not really a color itself.
+It's really a higher level class, which we will create a paint class that holds the style color information
+about how to draw geometry, texts and bitmaps and all those kind of things.
+We're going to use that.
+Then we're going to use a bitmap that we can draw on.
+ */
+
+    //And when we need all of those, it's a good idea to create variables for them.
     private var mDrawPath: CustomPath? =
         null // An variable of CustomPath inner class to use it further.
+
+    /*
+    https://www.ssaurel.com/blog/learn-to-create-a-paint-application-for-android/
+    So he created this little drawing app with Java creating a bunch of stuff.
+    And his code is a little more complicated than what we are going to build.
+    So you can check out this document here.
+    You can see this is what he has built, but we're going to build it differently.
+    As you saw, the final result is a little different, but in the end, it's going to be highly inspired
+    by his work.
+     */
+
+
     private var mCanvasBitmap: Bitmap? = null // An instance of the Bitmap.
 
     private var mDrawPaint: Paint? =
@@ -50,7 +77,8 @@ class DrawingView(context: Context,attrs:AttributeSet): View(context,attrs) {
 
         mDrawPaint?.color = color
 
-        mDrawPaint?.style = Paint.Style.STROKE // This is to draw a STROKE style
+        //mDrawPaint?.style = Paint.Style.STROKE // This is to draw a STROKE style
+        setStrokeStyle(1) // default STROKE-Style = 1
         mDrawPaint?.strokeJoin = Paint.Join.ROUND // This is for store join
         mDrawPaint?.strokeCap = Paint.Cap.ROUND // This is for stroke Cap
 
@@ -85,7 +113,7 @@ class DrawingView(context: Context,attrs:AttributeSet): View(context,attrs) {
          * @param paint The paint used to draw the bitmap (may be null)
          */
         mCanvasBitmap?.let {
-            canvas.drawBitmap(it, 0f,   0f, mCanvasPaint)
+            canvas.drawBitmap(it, 0f, 0f, mCanvasPaint)
         }
 
 
@@ -155,6 +183,16 @@ class DrawingView(context: Context,attrs:AttributeSet): View(context,attrs) {
         mDrawPaint!!.strokeWidth = mBrushSize
     }
 
+    fun setStrokeStyle(newStyle: Int ){
+            when (newStyle){
+                1 -> mDrawPaint?.style = Paint.Style.STROKE
+                2 -> mDrawPaint?.style = Paint.Style.FILL_AND_STROKE
+                3 -> mDrawPaint?.style = Paint.Style.FILL
+                else -> mDrawPaint?.style = Paint.Style.STROKE
+            }
+
+    }
+
     /**
      * This function is called when the user desires a color change.
      * This functions sets the color of a store to selected color and able to draw on view using that color.
@@ -179,5 +217,10 @@ class DrawingView(context: Context,attrs:AttributeSet): View(context,attrs) {
             invalidate() // Invalidate the whole view. If the view is visible
         }
     }
-    internal inner class CustomPath(var color:Int,var brushThickness:Float):Path()
+
+    /*
+    So this is our in our class here, which I made internal and it's called custom path and it's of type
+    path.
+     */
+    internal inner class CustomPath(var color: Int, var brushThickness: Float) : Path()
 }

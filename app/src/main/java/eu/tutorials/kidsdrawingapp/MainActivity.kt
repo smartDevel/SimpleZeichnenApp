@@ -29,22 +29,24 @@ import java.io.FileOutputStream
 
 class MainActivity : AppCompatActivity() {
     private var drawingView: DrawingView? = null
-    private var mImageButtonCurrentPaint: ImageButton? = null // A variable for current color is picked from color pallet.
+    private var mImageButtonCurrentPaint: ImageButton? =
+        null // A variable for current color is picked from color pallet.
 
     var customProgressDialog: Dialog? = null
 
 
-//Todo 2: create an activity result launcher to open an intent
-    val openGalleryLauncher:ActivityResultLauncher<Intent> = registerForActivityResult(ActivityResultContracts.StartActivityForResult()){result->
-    //Todo 3: get the returned result from the lambda and check the resultcode and the data returned
-    if (result.resultCode == RESULT_OK && result.data != null){
-            //process the data
+    //Todo 2: create an activity result launcher to open an intent
+    val openGalleryLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            //Todo 3: get the returned result from the lambda and check the resultcode and the data returned
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                //process the data
                 //Todo 4 if the data is not null reference the imageView from the layout
-            val imageBackground:ImageView = findViewById(R.id.iv_background)
-        //Todo 5: set the imageuri received
-            imageBackground.setImageURI(result.data?.data)
+                val imageBackground: ImageView = findViewById(R.id.iv_background)
+                //Todo 5: set the imageuri received
+                imageBackground.setImageURI(result.data?.data)
+            }
         }
-    }
 
     /** create an ActivityResultLauncher with MultiplePermissions since we are requesting
      * both read and write
@@ -55,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                 val perMissionName = it.key
                 val isGranted = it.value
                 //if permission is granted show a toast and perform operation
-                if (isGranted ) {
+                if (isGranted) {
                     Toast.makeText(
                         this@MainActivity,
                         "Permission granted now you can read the storage files.",
@@ -63,23 +65,23 @@ class MainActivity : AppCompatActivity() {
                     ).show()
                     //perform operation
                     //Todo 1: create an intent to pick image from external storage
-                    val pickIntent = Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    val pickIntent =
+                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
                     //Todo 6: using the intent launcher created above launch the pick intent
                     openGalleryLauncher.launch(pickIntent)
                 } else {
-            //Displaying another toast if permission is not granted and this time focus on
-            //    Read external storage
-                if (perMissionName == Manifest.permission.READ_EXTERNAL_STORAGE)
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Oops you just denied the permission.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    //Displaying another toast if permission is not granted and this time focus on
+                    //    Read external storage
+                    if (perMissionName == Manifest.permission.READ_EXTERNAL_STORAGE)
+                        Toast.makeText(
+                            this@MainActivity,
+                            "Oops you just denied the permission.",
+                            Toast.LENGTH_LONG
+                        ).show()
                 }
             }
 
         }
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,6 +89,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         drawingView = findViewById(R.id.drawing_view)
         val ibBrush: ImageButton = findViewById(R.id.ib_brush)
+        val ibStroke: ImageButton = findViewById(R.id.ib_stroke)
         drawingView?.setSizeForBrush(20.toFloat())
         val linearLayoutPaintColors = findViewById<LinearLayout>(R.id.ll_paint_colors)
         mImageButtonCurrentPaint = linearLayoutPaintColors[1] as ImageButton
@@ -99,6 +102,10 @@ class MainActivity : AppCompatActivity() {
         ibBrush.setOnClickListener {
             showBrushSizeChooserDialog()
         }
+        ibStroke.setOnClickListener {
+            showStrokeStyleChooserDialog()
+        }
+
         val ibGallery: ImageButton = findViewById(R.id.ib_gallery)
         ibGallery.setOnClickListener {
             requestStoragePermission()
@@ -108,18 +115,18 @@ class MainActivity : AppCompatActivity() {
             // This is for undo recent stroke.
             drawingView?.onClickUndo()
         }
-            //reference the save button from the layout
-        val ibSave:ImageButton = findViewById(R.id.ib_save)
-              //set onclick listener
-        ibSave.setOnClickListener{
-               //check if permission is allowed
-            if (isReadStorageAllowed()){
+        //reference the save button from the layout
+        val ibSave: ImageButton = findViewById(R.id.ib_save)
+        //set onclick listener
+        ibSave.setOnClickListener {
+            //check if permission is allowed
+            if (isReadStorageAllowed()) {
                 showProgressDialog()
-             //launch a coroutine block
-                lifecycleScope.launch{
-               //reference the frame layout
-                    val flDrawingView:FrameLayout = findViewById(R.id.fl_drawing_view_container)
-                  //Save the image to the device
+                //launch a coroutine block
+                lifecycleScope.launch {
+                    //reference the frame layout
+                    val flDrawingView: FrameLayout = findViewById(R.id.fl_drawing_view_container)
+                    //Save the image to the device
                     saveBitmapFile(getBitmapFromView(flDrawingView))
                 }
             }
@@ -152,6 +159,28 @@ class MainActivity : AppCompatActivity() {
         brushDialog.show()
     }
 
+    private fun showStrokeStyleChooserDialog() {
+        val strokestyleDialog = Dialog(this)
+        strokestyleDialog.setContentView(R.layout.dialog_stroke_style)
+        strokestyleDialog.setTitle("Stroke-Style :")
+        val strokeBtn: ImageButton = strokestyleDialog.findViewById(R.id.ib_strokebrush)
+        strokeBtn.setOnClickListener(View.OnClickListener{
+            drawingView?.setStrokeStyle(1)
+            strokestyleDialog.dismiss()
+        })
+        val fillstrokeBtn: ImageButton = strokestyleDialog.findViewById(R.id.ib_fillstroke_brush)
+        fillstrokeBtn.setOnClickListener(View.OnClickListener{
+            drawingView?.setStrokeStyle(2)
+            strokestyleDialog.dismiss()
+        })
+        val fillBtn: ImageButton = strokestyleDialog.findViewById(R.id.ib_fill_brush)
+        fillBtn.setOnClickListener(View.OnClickListener{
+            drawingView?.setStrokeStyle(3)
+            strokestyleDialog.dismiss()
+        })
+        strokestyleDialog.show()
+    }
+
     /**
      * Method is called when color is clicked from pallet_normal.
      *
@@ -179,6 +208,7 @@ class MainActivity : AppCompatActivity() {
             mImageButtonCurrentPaint = view
         }
     }
+
     /**
      * We are calling this method to check the permission status
      */
@@ -204,22 +234,25 @@ class MainActivity : AppCompatActivity() {
         //If permission is granted returning true and If permission is not granted returning false
         return result == PackageManager.PERMISSION_GRANTED
     }
-//create a method to requestStorage permission
-    private fun requestStoragePermission(){
-    // Check if the permission was denied and show rationale
+
+    //create a method to requestStorage permission
+    private fun requestStoragePermission() {
+        // Check if the permission was denied and show rationale
         if (
             ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
-                    Manifest.permission.READ_EXTERNAL_STORAGE)
-        ){
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        ) {
             //call the rationale dialog to tell the user why they need to allow permission request
-            showRationaleDialog("Kids Drawing App","Kids Drawing App " +
-                    "needs to Access Your External Storage")
-        }
-        else {
+            showRationaleDialog(
+                "Kids Drawing App", "Kids Drawing App " +
+                        "needs to Access Your External Storage"
+            )
+        } else {
             // You can directly ask for the permission.
             //if it has not been denied then request for permission
-                //  The registered ActivityResultCallback gets the result of this request.
+            //  The registered ActivityResultCallback gets the result of this request.
             requestPermission.launch(
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -229,6 +262,7 @@ class MainActivity : AppCompatActivity() {
         }
 
     }
+
     /**  create rationale dialog
      * Shows rationale dialog for displaying why the app needs permission
      * Only shown if the user has denied the permission request previously
@@ -271,7 +305,7 @@ class MainActivity : AppCompatActivity() {
         return returnedBitmap
     }
 
-    private suspend fun saveBitmapFile(mBitmap: Bitmap?):String{
+    private suspend fun saveBitmapFile(mBitmap: Bitmap?): String {
         var result = ""
         withContext(Dispatchers.IO) {
             if (mBitmap != null) {
@@ -313,7 +347,7 @@ class MainActivity : AppCompatActivity() {
                     fo.write(bytes.toByteArray()) // Writes bytes from the specified byte array to this file output stream.
                     fo.close() // Closes this file output stream and releases any system resources associated with this stream. This file output stream may no longer be used for writing bytes.
                     result = f.absolutePath // The file absolute path is return as a result.
-                   //We switch from io to ui thread to show a toast
+                    //We switch from io to ui thread to show a toast
                     runOnUiThread {
                         cancelProgressDialog()
                         if (!result.isEmpty()) {
@@ -340,7 +374,7 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
-    private fun shareImage(result:String){
+    private fun shareImage(result: String) {
         // TODO (Step 1 - Sharing the downloaded Image file)
         // START
 
@@ -378,6 +412,7 @@ class MainActivity : AppCompatActivity() {
         }
         // END
     }
+
     /**
      * Method is used to show the Custom Progress Dialog.
      */
