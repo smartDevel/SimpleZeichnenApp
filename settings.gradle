@@ -6,5 +6,5 @@ dependencyResolutionManagement {
         jcenter() // Warning: this repository is going to shut down soon
     }
 }
-rootProject.name = "Kids Drawing App"
+rootProject.name = "Einfache Zeichnen-App"
 include ':app'

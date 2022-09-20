@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="eu.tutorials.kidsdrawingapp">
+    package="me.ways4.simplezeichnenapp">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
@@ -11,7 +11,7 @@
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_strokestyle"
         android:supportsRtl="true"
-        android:theme="@style/Theme.KidsDrawingApp">
+        android:theme="@style/Theme.SimpleZeichnenApp">
         <activity
             android:name=".MainActivity"
             android:screenOrientation="portrait"
@@ -26,7 +26,7 @@
         <!--SOURCE : https://developer.android.com/guide/topics/manifest/provider-element-->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="eu.kidsdrawingapp.fileprovider"
+            android:authorities="me.ways4.simplezeichnenapp"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

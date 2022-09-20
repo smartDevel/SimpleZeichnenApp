@@ -27,7 +27,7 @@
             android:contentDescription="image"
             android:scaleType="centerCrop" />
 
-        <eu.tutorials.kidsdrawingapp.DrawingView
+        <me.ways4.simplezeichnenapp.DrawingView
             android:id="@+id/drawing_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

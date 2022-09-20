@@ -1,4 +1,4 @@
-package eu.tutorials.kidsdrawingapp
+package me.ways4.simplezeichnenapp
 
 import org.junit.Test
 

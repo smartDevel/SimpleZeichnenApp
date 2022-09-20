@@ -7,7 +7,7 @@ android {
     compileSdk 31
 
     defaultConfig {
-        applicationId "eu.tutorials.kidsdrawingapp"
+        applicationId "me.ways4.simplezeichnenapp"
         minSdk 26
         targetSdk 31
         versionCode 1
