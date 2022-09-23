@@ -1,6 +1,34 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?><!--
+<paths>
+
+    <external-path
+        name="captured"
+
+
+
+
+&lt;!&ndash;        path="Android/data/me.ways4.simplezeichnenapp/files" />&ndash;&gt;
+&lt;!&ndash;        path="Download" />&ndash;&gt;
+&lt;!&ndash;        path="Android/data/me.ways4.simplezeichnenapp/files" />&ndash;&gt;
+
+</paths>-->
+
+<!--    //20220923_SY_Changed_Removed_funMediaScannerConnections-->
+<!--New paths:-->
 <paths>
     <external-path
         name="captured"
-        path="Android/data/eu.kidsdrawingapp/files" />
+        path="." />
+    <external-cache-path
+        name="external path"
+        path="." />
+    <files-path
+        name="files"
+        path="." />
+    <cache-path
+        name="cache"
+        path="." />
+    <files-path
+        name="files"
+        path="." />
 </paths>

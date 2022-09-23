@@ -3,7 +3,7 @@
     package="me.ways4.simplezeichnenapp">
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
-        android:maxSdkVersion="28" />
+        android:maxSdkVersion="32" />
 
     <application
         android:allowBackup="true"
@@ -26,7 +26,7 @@
         <!--SOURCE : https://developer.android.com/guide/topics/manifest/provider-element-->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="me.ways4.simplezeichnenapp"
+            android:authorities="me.ways4.simplezeichnenapp.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

@@ -2,14 +2,19 @@ package me.ways4.simplezeichnenapp
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.MediaStore.AUTHORITY
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
@@ -18,6 +23,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.core.view.get
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -34,6 +40,13 @@ class MainActivity : AppCompatActivity() {
 
     var customProgressDialog: Dialog? = null
 
+    // 20220923_SY_Changed_uri_MediaStore
+    // static variables
+    companion object {
+        private const val STORAGE_PERMISSION_CODE = 1
+        private const val GALLERY = 2
+        private const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.fileprovider"
+    }
 
     //Todo 2: create an activity result launcher to open an intent
     val openGalleryLauncher: ActivityResultLauncher<Intent> =
@@ -164,17 +177,17 @@ class MainActivity : AppCompatActivity() {
         strokestyleDialog.setContentView(R.layout.dialog_stroke_style)
         strokestyleDialog.setTitle("Stroke-Style :")
         val strokeBtn: ImageButton = strokestyleDialog.findViewById(R.id.ib_strokebrush)
-        strokeBtn.setOnClickListener(View.OnClickListener{
+        strokeBtn.setOnClickListener(View.OnClickListener {
             drawingView?.setStrokeStyle(1)
             strokestyleDialog.dismiss()
         })
         val fillstrokeBtn: ImageButton = strokestyleDialog.findViewById(R.id.ib_fillstroke_brush)
-        fillstrokeBtn.setOnClickListener(View.OnClickListener{
+        fillstrokeBtn.setOnClickListener(View.OnClickListener {
             drawingView?.setStrokeStyle(2)
             strokestyleDialog.dismiss()
         })
         val fillBtn: ImageButton = strokestyleDialog.findViewById(R.id.ib_fill_brush)
-        fillBtn.setOnClickListener(View.OnClickListener{
+        fillBtn.setOnClickListener(View.OnClickListener {
             drawingView?.setStrokeStyle(3)
             strokestyleDialog.dismiss()
         })
@@ -333,6 +346,10 @@ class MainActivity : AppCompatActivity() {
                      * @return true if successfully compressed to the specified stream.
                      */
 
+                    /*val f = File(
+                       "Download"
+                               + File.separator + "SySimpleZeichenApp_" + System.currentTimeMillis() / 1000 + ".jpg"
+                   )*/
                     val f = File(
                         externalCacheDir?.absoluteFile.toString()
                                 + File.separator + "SySimpleZeichenApp_" + System.currentTimeMillis() / 1000 + ".jpg"
@@ -356,7 +373,17 @@ class MainActivity : AppCompatActivity() {
                                 "File saved successfully :$result",
                                 Toast.LENGTH_LONG
                             ).show()
-                            shareImage(result)
+                            //20220923_SY_Changed_Removed_funMediaScannerConnections
+                            // old fun commented
+                            //shareImage(result)
+                            //new fun:
+                            shareImage2(
+                                FileProvider.getUriForFile(
+                                    baseContext,
+                                    "me.ways4.simplezeichnenapp.fileprovider",
+                                    f
+                                )
+                            )
                         } else {
                             Toast.makeText(
                                 this@MainActivity,
@@ -374,8 +401,10 @@ class MainActivity : AppCompatActivity() {
         return result
     }
 
+    //20220923_SY_Changed_Removed_funMediaScannerConnections
+    // Old funShareImage no more needed
     private fun shareImage(result: String) {
-        // TODO (Step 1 - Sharing the downloaded Image file)
+
         // START
 
         /*MediaScannerConnection provides a way for applications to pass a
@@ -387,31 +416,78 @@ class MainActivity : AppCompatActivity() {
         to the client of the MediaScannerConnection class.*/
 
         /*scanFile is used to scan the file when the connection is established with MediaScanner.*/
+
+
+// offer to share content
         MediaScannerConnection.scanFile(
-            this@MainActivity, arrayOf(result), null
-        ) { path, uri ->
-            // This is used for sharing the image after it has being stored in the storage.
+            this@MainActivity,
+            arrayOf(result),
+            null
+        ) { path, _ ->
+
+            // Use the FileProvider to get a content URI
+            val requestFile = File(path)
+            //var file = File(path);
+            var pathuri: Uri = Uri.fromFile(requestFile)
+            val fileUri: Uri? = try {
+                FileProvider.getUriForFile(
+                    this@MainActivity,
+                    AUTHORITY,
+                    requestFile
+                )
+            } catch (e: IllegalArgumentException) {
+                Log.e(
+                    "File Selector",
+                    "The selected file can't be shared: $requestFile"
+                )
+                null
+            }
+
+            Log.e("ExternalStorage", "Scanned " + path + ":");
+            Log.e("ExternalStorage", "-> fileUri=" + fileUri);
+            Log.e("ExternalStorage", "-> uri=" + pathuri);
+            Log.e("Authority-Value", ": " + AUTHORITY.toString())
+
+
             val shareIntent = Intent()
-            shareIntent.action = Intent.ACTION_SEND
-            shareIntent.putExtra(
-                Intent.EXTRA_STREAM,
-                uri
-            ) // A content: URI holding a stream of data associated with the Intent, used to supply the data being sent.
-            shareIntent.type =
-                "image/png" // The MIME type of the data being handled by this intent.
+            shareIntent.setAction(Intent.ACTION_SEND)
+            var file = File(pathuri.toString())
+            shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+
+            val contentURI = getContentUri(this@MainActivity, file.absolutePath)
+            Log.e("contentURI", "-> contentUri=" + contentURI);
+            //shareIntent.setDataAndType(contentURI,"image/*")
+            shareIntent.type = "image/*";
+            //shareIntent.type = "image/jpg"
+            shareIntent.putExtra(Intent.EXTRA_STREAM, contentURI)
+            //shareIntent.putExtra(Intent.EXTRA_STREAM,fileUri)
+            //val `is`: InputStream = contentResolver.openInputStream(contentURI)
+            //startActivity(shareIntent)
             startActivity(
                 Intent.createChooser(
-                    shareIntent,
-                    "Share"
+                    shareIntent, "Share"
                 )
-            )// Activity Action: Display an activity chooser,
-            // allowing the user to pick what they want to before proceeding.
-            // This can be used as an alternative to the standard activity picker
-            // that is displayed by the system when you try to start an activity with multiple possible matches,
-            // with these differences in behavior:
+            )
+
+
         }
+
+
         // END
     }
+
+    //20220923_SY_Changed_Removed_funMediaScannerConnections
+    // New fun for shareImage
+    private fun shareImage2(uri: Uri) {
+        val intent = Intent().apply {
+            this.action = Intent.ACTION_SEND
+            this.putExtra(Intent.EXTRA_STREAM, uri)
+            this.type = "image/*"
+        }
+        startActivity(Intent.createChooser(intent, "Share image via "))
+    }
+
 
     /**
      * Method is used to show the Custom Progress Dialog.
@@ -434,6 +510,39 @@ class MainActivity : AppCompatActivity() {
         if (customProgressDialog != null) {
             customProgressDialog?.dismiss()
             customProgressDialog = null
+        }
+    }
+
+    // 20220923_SY_Changed_uri_MediaStore
+    // Funktion getContentURI wandelt File-Path in contentURI um
+    private fun getContentUri(context: Context, absPath: String): Uri? {
+        val cursor = context.getContentResolver().query(
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            arrayOf<String>(MediaStore.Images.Media._ID),
+            MediaStore.Images.Media.DATA + "=? ",
+            arrayOf<String>(absPath), null
+        )
+        if (cursor != null && cursor.moveToFirst()) {
+
+            //// 20220923_SY_Changed_uri_MediaStore
+            //wegen fehlermeldung 'must be >= 0' geändert von getColumnIndex zu getColumnIndexOrThrow
+            // siehe: https://stackoverflow.com/questions/69053061/android-studio-value-must-be-%E2%89%A5-0
+            val id = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID))
+            //Orig:
+            // val id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID))
+
+            return Uri.withAppendedPath(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                Integer.toString(id)
+            )
+        } else if (!absPath.isEmpty()) {
+            val values = ContentValues()
+            values.put(MediaStore.Images.Media.DATA, absPath)
+            return context.getContentResolver().insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
+            )
+        } else {
+            return null
         }
     }
 }
