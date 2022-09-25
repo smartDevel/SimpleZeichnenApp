@@ -4,16 +4,31 @@ plugins {
 }
 
 android {
+    signingConfigs {
+        debug {
+            storeFile file('C:\\Users\\Herby\\keystore\\sy_key_android_v01.jks')
+            keyAlias 'key1'
+            storePassword ANDROID_STORE_PASSWORD
+            keyPassword ANDROID_KEY_PASSWORD
+        }
+        release {
+            storeFile file('C:\\Users\\Herby\\keystore\\sy_key_android_v01.jks')
+            keyAlias 'key1'
+            storePassword ANDROID_STORE_PASSWORD
+            keyPassword ANDROID_KEY_PASSWORD
+        }
+    }
     compileSdk 31
 
     defaultConfig {
         applicationId "me.ways4.simplezeichnenapp"
         minSdk 26
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "2.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
 
     buildTypes {

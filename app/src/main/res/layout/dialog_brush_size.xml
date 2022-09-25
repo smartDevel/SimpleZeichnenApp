@@ -1,39 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/tvBrushSizeDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:gravity="center"
+        android:text="@string/brush_desc_text"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 
     <ImageButton
         android:id="@+id/ib_small_brush"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="image"
+        android:contentDescription="@string/image_contentDescription"
         android:src="@drawable/small"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/ib_medium_brush"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/ib_medium_brush"/>
+        app:layout_constraintTop_toBottomOf="@+id/tvBrushSizeDesc" />
 
     <ImageButton
         android:id="@+id/ib_medium_brush"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="image"
+        android:contentDescription="@string/image_contentDescription"
         android:src="@drawable/medium"
-        app:layout_constraintTop_toBottomOf="@id/ib_small_brush"
+        app:layout_constraintBottom_toTopOf="@+id/ib_large_brush"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/ib_large_brush"/>
+        app:layout_constraintTop_toBottomOf="@id/ib_small_brush" />
 
     <ImageButton
         android:id="@+id/ib_large_brush"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="image"
+        android:contentDescription="@string/image_contentDescription"
         android:src="@drawable/large"
-        app:layout_constraintTop_toBottomOf="@id/ib_medium_brush"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/ib_medium_brush" />
+
+    <TextView
+        android:id="@+id/tvBrushSizeBar_txt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="@string/brush_bar_txt"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ib_large_brush" />
+
+    <SeekBar
+        android:id="@+id/seek_brush"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:max="50"
+        android:progress="20"
+        app:layout_constraintBottom_toTopOf="@+id/tvBrushSizeBar_txt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ib_large_brush" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

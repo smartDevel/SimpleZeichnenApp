@@ -45,10 +45,14 @@ Then we're going to use a bitmap that we can draw on.
 
     private var mBrushSize: Float =
         0.toFloat() // A variable for stroke/brush size to draw on the canvas.
+    private var mChoosedBrushedSize: Float = 0.toFloat()
 
     // A variable to hold a color of the stroke.
     private var color = Color.BLACK
 
+    // A variable to hold a value for opacity (Alpha) of color
+    private var paintAlpha: Int = 255
+    //private var opacity : Int = 255
     /**
      * A variable for canvas which will be initialized later and used.
      *
@@ -67,6 +71,20 @@ Then we're going to use a bitmap that we can draw on.
         setUpDrawing()
     }
 
+    fun getPaintAlpha(): Int {
+        return Math.round(paintAlpha.toFloat() / 255 * 255)
+    }
+    fun getBrushSize(): Float {
+        return mChoosedBrushedSize
+        //return Math.round(mBrushSize.toFloat() / 50 * 255)
+    }
+
+    fun setPaintAlpha(newAlpha: Int) {
+        paintAlpha = Math.round(newAlpha.toFloat() / 255 * 255)
+        mDrawPaint?.setColor(color)
+        mDrawPaint?.setAlpha(paintAlpha)
+    }
+
     /**
      * This method initializes the attributes of the
      * ViewForDrawing class.
@@ -76,6 +94,9 @@ Then we're going to use a bitmap that we can draw on.
         mDrawPath = CustomPath(color, mBrushSize)
 
         mDrawPaint?.color = color
+        // TODO: implement opacity
+        mDrawPaint?.alpha = getPaintAlpha()
+        //mDrawPaint?.alpha = 120
 
         //mDrawPaint?.style = Paint.Style.STROKE // This is to draw a STROKE style
         setStrokeStyle(1) // default STROKE-Style = 1
@@ -120,6 +141,9 @@ Then we're going to use a bitmap that we can draw on.
         for (p in mPaths) {
             mDrawPaint?.strokeWidth = p.brushThickness
             mDrawPaint?.color = p.color
+            // TODO: implement opacity-control
+            mDrawPaint?.alpha = getPaintAlpha()
+            //mDrawPaint?.alpha = 120
             canvas.drawPath(p, mDrawPaint!!)
         }
 
@@ -176,6 +200,7 @@ Then we're going to use a bitmap that we can draw on.
      * sizes to the new values depending on user selection.
      */
     fun setSizeForBrush(newSize: Float) {
+        mChoosedBrushedSize = newSize
         mBrushSize = TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP, newSize,
             resources.displayMetrics
@@ -183,13 +208,13 @@ Then we're going to use a bitmap that we can draw on.
         mDrawPaint!!.strokeWidth = mBrushSize
     }
 
-    fun setStrokeStyle(newStyle: Int ){
-            when (newStyle){
-                1 -> mDrawPaint?.style = Paint.Style.STROKE
-                2 -> mDrawPaint?.style = Paint.Style.FILL_AND_STROKE
-                3 -> mDrawPaint?.style = Paint.Style.FILL
-                else -> mDrawPaint?.style = Paint.Style.STROKE
-            }
+    fun setStrokeStyle(newStyle: Int) {
+        when (newStyle) {
+            1 -> mDrawPaint?.style = Paint.Style.STROKE
+            2 -> mDrawPaint?.style = Paint.Style.FILL_AND_STROKE
+            3 -> mDrawPaint?.style = Paint.Style.FILL
+            else -> mDrawPaint?.style = Paint.Style.STROKE
+        }
 
     }
 
@@ -202,6 +227,11 @@ Then we're going to use a bitmap that we can draw on.
     fun setColor(newColor: String) {
         color = Color.parseColor(newColor)
         mDrawPaint!!.color = color
+        mDrawPaint!!.alpha = getPaintAlpha()
+    }
+
+    fun setOpacity(newOp: Int) {
+        mDrawPaint!!.alpha = newOp
     }
 
     /**

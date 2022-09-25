@@ -1,4 +1,18 @@
 <resources>
     <string name="app_name">Einfach eine Zeichnen-App</string>
     <string name="toolTipIbGallery">Hintergrund-Bild laden</string>
+    <string name="toolTipIbUndo">Rückgängig machen</string>
+    <string name="toolTipIbBrush">Strichbreite festlegen</string>
+    <string name="toolTipIbStroke">Strichstil festlegen</string>
+    <string name="toolTipIbOpacity">Transparenz festlegen</string>
+    <string name="toolTipIbSave">Speichern und Teilen</string>
+    <string name="image_contentDescription">Image</string>
+    <string name="opac_desc_text">Bitte Farbdichte (Opacity) festlegen [0...255]</string>
+    <string name="opac_opq_txt">[0...255]</string>
+    <string name="opac_opq_ok">OK</string>
+    <string name="brush_desc_text">Bitte Strichbreite festlegen</string>
+    <string name="brush_bar_txt">[0...50]</string>
+    <string name="str_about">App-Info</string>
+    <string name="str_Share">Teilen</string>
+    <string name="str_Exit">Beenden</string>
 </resources>

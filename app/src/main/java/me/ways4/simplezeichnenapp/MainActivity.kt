@@ -13,10 +13,13 @@ import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
-import android.provider.MediaStore.AUTHORITY
 import android.util.Log
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import android.widget.SeekBar.OnSeekBarChangeListener
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
@@ -33,6 +36,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
+
 class MainActivity : AppCompatActivity() {
     private var drawingView: DrawingView? = null
     private var mImageButtonCurrentPaint: ImageButton? =
@@ -43,8 +47,6 @@ class MainActivity : AppCompatActivity() {
     // 20220923_SY_Changed_uri_MediaStore
     // static variables
     companion object {
-        private const val STORAGE_PERMISSION_CODE = 1
-        private const val GALLERY = 2
         private const val AUTHORITY = "${BuildConfig.APPLICATION_ID}.fileprovider"
     }
 
@@ -103,6 +105,8 @@ class MainActivity : AppCompatActivity() {
         drawingView = findViewById(R.id.drawing_view)
         val ibBrush: ImageButton = findViewById(R.id.ib_brush)
         val ibStroke: ImageButton = findViewById(R.id.ib_stroke)
+        val ibOpacity: ImageButton = findViewById(R.id.ib_opacity)
+
         drawingView?.setSizeForBrush(20.toFloat())
         val linearLayoutPaintColors = findViewById<LinearLayout>(R.id.ll_paint_colors)
         mImageButtonCurrentPaint = linearLayoutPaintColors[1] as ImageButton
@@ -119,6 +123,10 @@ class MainActivity : AppCompatActivity() {
             showStrokeStyleChooserDialog()
         }
 
+        ibOpacity.setOnClickListener {
+            showOpacityChooserDialog()
+        }
+
         val ibGallery: ImageButton = findViewById(R.id.ib_gallery)
         ibGallery.setOnClickListener {
             requestStoragePermission()
@@ -132,18 +140,40 @@ class MainActivity : AppCompatActivity() {
         val ibSave: ImageButton = findViewById(R.id.ib_save)
         //set onclick listener
         ibSave.setOnClickListener {
-            //check if permission is allowed
-            if (isReadStorageAllowed()) {
-                showProgressDialog()
-                //launch a coroutine block
-                lifecycleScope.launch {
-                    //reference the frame layout
-                    val flDrawingView: FrameLayout = findViewById(R.id.fl_drawing_view_container)
-                    //Save the image to the device
-                    saveBitmapFile(getBitmapFromView(flDrawingView))
-                }
-            }
+
+            //20220925_V2_Added_AboutMenu Refactor Save
+            img_save()
         }
+    }
+
+    private fun showOpacityChooserDialog() {
+
+        val opacDialog = Dialog(this)
+        opacDialog.setContentView(R.layout.opacity_chooser)
+        opacDialog.setTitle("Opacity :")
+        val seekTxt: TextView = opacDialog.findViewById(R.id.opq_txt)
+        val seekOpq: SeekBar = opacDialog.findViewById(R.id.opacity_seek)
+        seekOpq.setMax(255)
+        var currOpac: Int = 0
+        currOpac = drawingView?.getPaintAlpha()!!
+        seekTxt.setText(currOpac.toString() + " von 255")
+        seekOpq.setProgress(currOpac)
+        seekOpq.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                seekTxt.text = Integer.toString(progress) + " von 255"
+            }
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        })
+        val opqBtn = opacDialog.findViewById(R.id.opq_ok) as Button
+
+        opqBtn.setOnClickListener(View.OnClickListener {
+            drawingView?.setPaintAlpha(seekOpq.getProgress())
+            opacDialog.dismiss()
+        })
+        opacDialog.show()
+
     }
 
     /**
@@ -152,7 +182,39 @@ class MainActivity : AppCompatActivity() {
     private fun showBrushSizeChooserDialog() {
         val brushDialog = Dialog(this)
         brushDialog.setContentView(R.layout.dialog_brush_size)
-        brushDialog.setTitle("Brush size :")
+        brushDialog.setTitle("Strichstärke :")
+
+//20220924_AddedProgressbarBrushSize
+        val brushBarTxt: TextView = brushDialog.findViewById(R.id.tvBrushSizeBar_txt)
+        val seekBrush: SeekBar = brushDialog.findViewById(R.id.seek_brush)
+        seekBrush.max = 255
+        seekBrush.min = 0
+        val currBrushSize = drawingView?.getBrushSize()?.let { Math.round(it) }
+        //var currBrushProg = currBrushSize!! / 138 * 50
+        //Log.e("CurrentBrushSize", "Current Brush-Size " + currBrushSize + " :");
+        val txtBrushBar: String = currBrushSize.toString() + " von 50"
+        brushBarTxt.text = txtBrushBar
+
+        if (currBrushSize != null) {
+            seekBrush.setProgress(currBrushSize.toInt())
+        }
+        seekBrush.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+            override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
+                brushBarTxt.text =
+                    Math.round(progress.toFloat() / 255 * 50).toInt().toString() + " von 50"
+                val newBrushSize: Float = Math.round(progress.toFloat() / 255 * 50).toFloat()
+                drawingView?.setSizeForBrush(newBrushSize)
+                //Log.e("NewBrushSize", "New Brush-Size " + newBrushSize + " :")
+
+
+            }
+            //20220924
+
+
+            override fun onStartTrackingTouch(seekBar: SeekBar) {}
+            override fun onStopTrackingTouch(seekBar: SeekBar) {}
+        }
+        )
         val smallBtn: ImageButton = brushDialog.findViewById(R.id.ib_small_brush)
         smallBtn.setOnClickListener(View.OnClickListener {
             drawingView?.setSizeForBrush(10.toFloat())
@@ -259,8 +321,8 @@ class MainActivity : AppCompatActivity() {
         ) {
             //call the rationale dialog to tell the user why they need to allow permission request
             showRationaleDialog(
-                "Kids Drawing App", "Kids Drawing App " +
-                        "needs to Access Your External Storage"
+                "Einfache Zeichnen App", "Zeichnen-App " +
+                        "benötigt Speicherzugriff"
             )
         } else {
             // You can directly ask for the permission.
@@ -352,7 +414,7 @@ class MainActivity : AppCompatActivity() {
                    )*/
                     val f = File(
                         externalCacheDir?.absoluteFile.toString()
-                                + File.separator + "SySimpleZeichenApp_" + System.currentTimeMillis() / 1000 + ".jpg"
+                                + File.separator + "SySimpleZeichnenApp_" + System.currentTimeMillis() / 1000 + ".jpg"
                     )
                     // Here the Environment : Provides access to environment variables.
                     // getExternalStorageDirectory : returns the primary shared/external storage directory.
@@ -443,10 +505,10 @@ class MainActivity : AppCompatActivity() {
                 null
             }
 
-            Log.e("ExternalStorage", "Scanned " + path + ":");
+            /*Log.e("ExternalStorage", "Scanned " + path + ":");
             Log.e("ExternalStorage", "-> fileUri=" + fileUri);
             Log.e("ExternalStorage", "-> uri=" + pathuri);
-            Log.e("Authority-Value", ": " + AUTHORITY.toString())
+            Log.e("Authority-Value", ": " + AUTHORITY.toString())*/
 
 
             val shareIntent = Intent()
@@ -456,14 +518,9 @@ class MainActivity : AppCompatActivity() {
             shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
 
             val contentURI = getContentUri(this@MainActivity, file.absolutePath)
-            Log.e("contentURI", "-> contentUri=" + contentURI);
-            //shareIntent.setDataAndType(contentURI,"image/*")
+            // Log.e("contentURI", "-> contentUri=" + contentURI);
             shareIntent.type = "image/*";
-            //shareIntent.type = "image/jpg"
             shareIntent.putExtra(Intent.EXTRA_STREAM, contentURI)
-            //shareIntent.putExtra(Intent.EXTRA_STREAM,fileUri)
-            //val `is`: InputStream = contentResolver.openInputStream(contentURI)
-            //startActivity(shareIntent)
             startActivity(
                 Intent.createChooser(
                     shareIntent, "Share"
@@ -545,4 +602,55 @@ class MainActivity : AppCompatActivity() {
             return null
         }
     }
+
+    //20220925_V2_Added_AboutMenu
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        var inflater: MenuInflater = menuInflater
+        inflater.inflate(R.menu.about, menu)
+        return true
+    }
+
+    //20220925_V2_Added_AboutMenu
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.m_about -> {
+                Toast.makeText(
+                    this,
+                    "Diese App wurde erstellt von Herbert Sablotny. App-Version: V2.0 20220925",
+                    Toast.LENGTH_LONG
+                ).show()
+                return true
+            }
+            R.id.m_share -> {
+                img_save()
+
+
+                return true
+            }
+            R.id.m_exit -> {
+                finish()
+                return true
+            }
+            else -> return super.onOptionsItemSelected(item)
+
+        }
+
+    }
+
+    //20220925_V2_Added_AboutMenu Refactor Save
+    private fun img_save() {
+        //check if permission is allowed
+        if (isReadStorageAllowed()) {
+            showProgressDialog()
+            //launch a coroutine block
+            lifecycleScope.launch {
+                //reference the frame layout
+                val flDrawingView: FrameLayout = findViewById(R.id.fl_drawing_view_container)
+                //Save the image to the device
+                saveBitmapFile(getBitmapFromView(flDrawingView))
+            }
+        }
+    }
+
+
 }
