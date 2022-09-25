@@ -616,7 +616,7 @@ class MainActivity : AppCompatActivity() {
             R.id.m_about -> {
                 Toast.makeText(
                     this,
-                    "Diese App wurde erstellt von Herbert Sablotny. App-Version: V2.0 20220925",
+                    "Diese App wurde erstellt von Herbert Sablotny. App-Version: V2.0.1 20220925",
                     Toast.LENGTH_LONG
                 ).show()
                 return true
