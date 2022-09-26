@@ -15,4 +15,14 @@
     <string name="str_about">App-Info</string>
     <string name="str_Share">Teilen</string>
     <string name="str_Exit">Beenden</string>
+    <string name="app_author">Herbert Sablotny</string>
+    <string name="app_policy_lnk">https://wp.me/p4wJQa-yZ</string>
+    <string name="dialogAbout_Title">Über diese App</string>
+    <string name="dialogAbout_tvAppname">App-Name</string>
+    <string name="dialogAbout_defaultTextAppName">Simple Zeichnen-App</string>
+    <string name="dialogAbout_tvVersionInfo">Versions-Info:</string>
+    <string name="dialogAbout_defaultVersionInfo">undefined</string>
+    <string name="dialogAbout_tvAutor">Autor:</string>
+    <string name="dialogAbout_tvPolicy">Policy</string>
+    <string name="dialogAbout_btnOk">OK</string>
 </resources>

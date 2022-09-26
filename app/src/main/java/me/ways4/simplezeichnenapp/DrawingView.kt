@@ -81,8 +81,8 @@ Then we're going to use a bitmap that we can draw on.
 
     fun setPaintAlpha(newAlpha: Int) {
         paintAlpha = Math.round(newAlpha.toFloat() / 255 * 255)
-        mDrawPaint?.setColor(color)
-        mDrawPaint?.setAlpha(paintAlpha)
+        mDrawPaint?.color = color
+        mDrawPaint?.alpha = paintAlpha
     }
 
     /**

@@ -44,6 +44,14 @@ class MainActivity : AppCompatActivity() {
 
     var customProgressDialog: Dialog? = null
 
+    //20220926_V2_1_Added_AboutMenu Dialog-Screen für App-Info
+    var customAboutDialog: Dialog? = null
+
+
+    private var mVersionCode = BuildConfig.VERSION_CODE
+    private var mVersionName = BuildConfig.VERSION_NAME
+    private var mAppName: String = "Simple Zeichnen-App"
+
     // 20220923_SY_Changed_uri_MediaStore
     // static variables
     companion object {
@@ -153,11 +161,11 @@ class MainActivity : AppCompatActivity() {
         opacDialog.setTitle("Opacity :")
         val seekTxt: TextView = opacDialog.findViewById(R.id.opq_txt)
         val seekOpq: SeekBar = opacDialog.findViewById(R.id.opacity_seek)
-        seekOpq.setMax(255)
+        seekOpq.max = 255
         var currOpac: Int = 0
         currOpac = drawingView?.getPaintAlpha()!!
-        seekTxt.setText(currOpac.toString() + " von 255")
-        seekOpq.setProgress(currOpac)
+        seekTxt.text = currOpac.toString() + " von 255"
+        seekOpq.progress = currOpac
         seekOpq.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 seekTxt.text = Integer.toString(progress) + " von 255"
@@ -169,12 +177,13 @@ class MainActivity : AppCompatActivity() {
         val opqBtn = opacDialog.findViewById(R.id.opq_ok) as Button
 
         opqBtn.setOnClickListener(View.OnClickListener {
-            drawingView?.setPaintAlpha(seekOpq.getProgress())
+            drawingView?.setPaintAlpha(seekOpq.progress)
             opacDialog.dismiss()
         })
         opacDialog.show()
 
     }
+
 
     /**
      * Method is used to launch the dialog to select different brush sizes.
@@ -196,7 +205,7 @@ class MainActivity : AppCompatActivity() {
         brushBarTxt.text = txtBrushBar
 
         if (currBrushSize != null) {
-            seekBrush.setProgress(currBrushSize.toInt())
+            seekBrush.progress = currBrushSize.toInt()
         }
         seekBrush.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
@@ -512,14 +521,14 @@ class MainActivity : AppCompatActivity() {
 
 
             val shareIntent = Intent()
-            shareIntent.setAction(Intent.ACTION_SEND)
+            shareIntent.action = Intent.ACTION_SEND
             var file = File(pathuri.toString())
-            shareIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            shareIntent.setFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION)
+            shareIntent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            shareIntent.flags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION
 
             val contentURI = getContentUri(this@MainActivity, file.absolutePath)
             // Log.e("contentURI", "-> contentUri=" + contentURI);
-            shareIntent.type = "image/*";
+            shareIntent.type = "image/*"
             shareIntent.putExtra(Intent.EXTRA_STREAM, contentURI)
             startActivity(
                 Intent.createChooser(
@@ -560,6 +569,30 @@ class MainActivity : AppCompatActivity() {
         customProgressDialog?.show()
     }
 
+    //20220926_V2_1_Added_AboutMenu Screen-Dialog
+    private fun showDialogAbout() {
+        customAboutDialog = Dialog(this@MainActivity)
+        customAboutDialog?.setContentView((R.layout.dialog_about))
+
+        val btnOkAbout = customAboutDialog?.findViewById<Button>(R.id.btnOk_about)
+        val tvVersionInfo =
+            customAboutDialog?.findViewById<TextView>(R.id.tvAppVersioninfoTxt_About)
+        val tvAppName = customAboutDialog?.findViewById<TextView>(R.id.tvAppNameTxt_About)
+
+
+        customAboutDialog?.setTitle("App-Info")
+        getVersionInfo()
+        tvVersionInfo?.text = "${mVersionName} $mVersionCode"
+        tvAppName?.text = mAppName
+
+        btnOkAbout?.setOnClickListener(View.OnClickListener
+        {
+            customAboutDialog?.dismiss()
+        })
+
+        customAboutDialog?.show()
+    }
+
     /**
      * This function is used to dismiss the progress dialog if it is visible to user.
      */
@@ -573,7 +606,7 @@ class MainActivity : AppCompatActivity() {
     // 20220923_SY_Changed_uri_MediaStore
     // Funktion getContentURI wandelt File-Path in contentURI um
     private fun getContentUri(context: Context, absPath: String): Uri? {
-        val cursor = context.getContentResolver().query(
+        val cursor = context.contentResolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
             arrayOf<String>(MediaStore.Images.Media._ID),
             MediaStore.Images.Media.DATA + "=? ",
@@ -595,7 +628,7 @@ class MainActivity : AppCompatActivity() {
         } else if (!absPath.isEmpty()) {
             val values = ContentValues()
             values.put(MediaStore.Images.Media.DATA, absPath)
-            return context.getContentResolver().insert(
+            return context.contentResolver.insert(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values
             )
         } else {
@@ -610,15 +643,12 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    //20220925_V2_Added_AboutMenu
+    //20220925_V2
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.m_about -> {
-                Toast.makeText(
-                    this,
-                    "Diese App wurde erstellt von Herbert Sablotny. App-Version: V2.0.1 20220925",
-                    Toast.LENGTH_LONG
-                ).show()
+                //20220926_V2_1_Added_AboutMenu_Screen
+                showDialogAbout()
                 return true
             }
             R.id.m_share -> {
@@ -653,4 +683,21 @@ class MainActivity : AppCompatActivity() {
     }
 
 
+    //20220926_V2_1_Added_AboutMenu_Screen_Dialog
+    private fun getVersionInfo() {
+        val context =
+            applicationContext // or activity.getApplicationContext()
+
+        val packageManager = context.packageManager
+        val packageName = context.packageName
+
+
+        try {
+            mVersionName = packageManager.getPackageInfo(packageName, 0).versionName
+            mAppName = applicationInfo.loadLabel(getPackageManager()).toString()
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
+        }
+
+    }
 }
