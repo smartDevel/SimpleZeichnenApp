@@ -1,11 +1,11 @@
 
-# App-Name
+# Über die App
 
 Eine simple Zeichnen-App
 
 
 
-Die **simple Zeichnen-App** ist ein kleines, nützliches Tool, um auf die Schnelle Skizzen zu erstellen.
+Die **Simple Zeichnen-App** ist ein kleines, nützliches Tool, um auf die Schnelle Skizzen zu erstellen.
 
 Sie bietet die notwendigsten Funktionen zum (farbigen) Zeichnen an.
 
