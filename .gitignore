@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+/app_desc.html
+/app_desc_V2.html
