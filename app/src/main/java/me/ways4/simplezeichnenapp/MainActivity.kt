@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity() {
                 if (isGranted) {
                     Toast.makeText(
                         this@MainActivity,
-                        "Permission granted now you can read the storage files.",
+                        "Permission granted now you can read/write the storage files.",
                         Toast.LENGTH_LONG
                     ).show()
                     //perform operation
@@ -95,7 +95,10 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     //Displaying another toast if permission is not granted and this time focus on
                     //    Read external storage
-                    if (perMissionName == Manifest.permission.READ_EXTERNAL_STORAGE)
+
+                    //20220929_changed_permission_handling_readprocess
+                    //if (perMissionName == Manifest.permission.READ_EXTERNAL_STORAGE)
+                        if (perMissionName == Manifest.permission.WRITE_EXTERNAL_STORAGE)
                         Toast.makeText(
                             this@MainActivity,
                             "Oops you just denied the permission.",
@@ -305,8 +308,13 @@ class MainActivity : AppCompatActivity() {
          * @param permission The name of the permission being checked.
          *
          */
+
+        //20220929_changed_permission_handling_readprocess
+//        val result = ContextCompat.checkSelfPermission(
+//            this, Manifest.permission.READ_EXTERNAL_STORAGE
+//        )
         val result = ContextCompat.checkSelfPermission(
-            this, Manifest.permission.READ_EXTERNAL_STORAGE
+            this, Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
 
         /**
@@ -322,12 +330,18 @@ class MainActivity : AppCompatActivity() {
     //create a method to requestStorage permission
     private fun requestStoragePermission() {
         // Check if the permission was denied and show rationale
+//        if (
+//            ActivityCompat.shouldShowRequestPermissionRationale(
+//                this,
+//                Manifest.permission.READ_EXTERNAL_STORAGE
+//            )
+//        )
         if (
             ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
-        ) {
+        )        {
             //call the rationale dialog to tell the user why they need to allow permission request
             showRationaleDialog(
                 "Einfache Zeichnen App", "Zeichnen-App " +
@@ -337,9 +351,16 @@ class MainActivity : AppCompatActivity() {
             // You can directly ask for the permission.
             //if it has not been denied then request for permission
             //  The registered ActivityResultCallback gets the result of this request.
+
+            //20220929_changed_permission_handling_readprocess
+//            requestPermission.launch(
+//                arrayOf(
+//                    Manifest.permission.READ_EXTERNAL_STORAGE,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+//                )
+//            )
             requestPermission.launch(
                 arrayOf(
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 )
             )

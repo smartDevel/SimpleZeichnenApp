@@ -25,8 +25,8 @@ android {
         minSdk 26
         maxSdk 32
         targetSdk 31
-        versionCode 20220926
-        versionName "2.1.0"
+        versionCode 20220929
+        versionName "2.1.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         signingConfig signingConfigs.release
